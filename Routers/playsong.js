@@ -6,24 +6,38 @@ const ytdl = require('ytdl-core');
 
 const ffmpeg = require('fluent-ffmpeg');
 
+
+Routerplay.use('/play', (req, res, next) => {
+  console.log(req.query.url)
+    res.setHeader('Content-Disposition', 'attachment; filename="audio.mp3"');
+    res.setHeader('Content-Type', 'audio/mpeg');
+    next();
+  });
+
+
+
 Routerplay.get('/play', (req, res) => {
     const videoUrl = req.query.url; // Get the video URL from the query string
   
     // Set the response headers to stream the converted MP3 file
-    res.header('Content-Disposition', 'attachment; filename="audio.mp3"');
-    res.header('Content-Type', 'audio/mpeg');
+//     res.header('Content-Disposition', 'attachment; filename="audio.mp3"');
+//     res.header('Content-Type', 'audio/mpeg');
+//       const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
+//   audioStream.pipe(res)
+
+  try {
+    const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
   
-    // Pipe the converted audio stream to the response
-    // ytdl(videoUrl, { quality: 'highestaudio' })
-    //   .pipe(ffmpeg().format('mp3'))
-    //   .pipe(res);
-
-
-      const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
-
- 
+    audioStream.on('error', (err) => {
+      console.error('Error during audio streaming:', err);
+      res.status(500).send('Error streaming audio');
+    });
   
-  audioStream.pipe(res)
+    audioStream.pipe(res);
+  } catch (err) {
+    console.error('Error retrieving video:', err);
+    res.status(500).send('Error retrieving video');
+  }
   });
 
 
