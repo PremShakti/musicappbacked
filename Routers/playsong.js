@@ -4,21 +4,60 @@ const Routerplay=express.Router()
 let usetube=require('usetube')
 const ytdl = require('ytdl-core');
 
-// Define the route to handle streaming of audio
+const ffmpeg = require('fluent-ffmpeg');
+
 Routerplay.get('/play', (req, res) => {
-  const videoUrl = req.query.url;
+    const videoUrl = req.query.url; // Get the video URL from the query string
+  
+    // Set the response headers to stream the converted MP3 file
+    res.header('Content-Disposition', 'attachment; filename="audio.mp3"');
+    res.header('Content-Type', 'audio/mpeg');
+  
+    // Pipe the converted audio stream to the response
+    // ytdl(videoUrl, { quality: 'highestaudio' })
+    //   .pipe(ffmpeg().format('mp3'))
+    //   .pipe(res);
 
-  // Set the appropriate headers for streaming audio
-  res.setHeader('Content-Type', 'audio/mpeg');
-  res.setHeader('Accept-Ranges', 'bytes');
 
-  // Extract the audio stream from the YouTube video
-  const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
+      const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
 
-  // Stream the audio to the client
+ 
   
   audioStream.pipe(res)
-});
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Define the route to handle streaming of audio
+// Routerplay.get('/play', (req, res) => {
+//   const videoUrl = req.query.url;
+
+//   // Set the appropriate headers for streaming audio
+//   res.setHeader('Content-Type', 'audio/mpeg');
+//   res.setHeader('Accept-Ranges', 'bytes');
+
+//   // Extract the audio stream from the YouTube video
+//   const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
+
+//   // Stream the audio to the client
+  
+//   audioStream.pipe(res)
+// });
+
+
+
 
 
 Routerplay.get('/search', async(req, res) => {
